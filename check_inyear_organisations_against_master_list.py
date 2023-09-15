@@ -30,10 +30,10 @@ os.chdir(
     'Source/In-year data'
 )
 
-df_oscar = pd.read_csv('OSCAR_in_year_dataset_June_2023.csv', encoding='cp1252')
+df_inyear = pd.read_csv('OSCAR_in_year_dataset_June_2023.csv', encoding='cp1252')
 
 # %%
-df_oscar
+df_inyear
 
 # %%
 # Read in master list of organisations
@@ -50,7 +50,7 @@ df_master = pd.read_pickle('2022_11_22_matched_oscar_21_22.pkl')
 # %%
 # Get unique organisation names in in-year OSCAR data not in master list
 set(
-    df_oscar['Organisation'].unique()
+    df_inyear['Organisation'].unique()
 ) - set(
     df_master['ORGANISATION_LONG_NAME'].unique()
 )
