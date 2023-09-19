@@ -15,7 +15,8 @@
             and the renaming we want to apply
         - columns_to_drop: List of columns we want to drop from the in-year data
     Notes
-        None
+        - We exclude non-budget, non-voted spend, as per previous Whitehall
+        Monitor analysis
 '''
 
 import os
@@ -266,3 +267,15 @@ assert len(df_inyear_annual_merged) == len(df_inyear_annual), \
 # Add a column to indicate when the data was added
 df_inyear_annual_merged['Added'] = pd.to_datetime('today').date()
 
+# %%
+# CARRY OUT FINAL CHECKS ON DATA
+# Check that no bodies have IfG_Organisation_Status, Checked_Organisation_Name or
+# IfG_Organisation_Type of NaN
+assert df_inyear_annual_merged['IfG_Organisation_Status'].isna().sum() == 0, \
+    'NaN values in IfG_Organisation_Status column'
+
+assert df_inyear_annual_merged['Checked_Organisation_Name'].isna().sum() == 0, \
+    'NaN values in Checked_Organisation_Name column'
+
+assert df_inyear_annual_merged['IfG_Organisation_Type'].isna().sum() == 0, \
+    'NaN values in IfG_Organisation_Type column'
