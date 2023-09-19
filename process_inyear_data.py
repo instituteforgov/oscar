@@ -176,8 +176,9 @@ df_inyear_annual_merged = df_inyear_annual.merge(
         ]
     ].drop_duplicates(),
     how='left',
-    on=['ORGANISATION_LONG_NAME', 'ORGANISATION_CODE']
-)
+    on=['ORGANISATION_CODE'],
+    suffixes=(None, '_previous'),
+).drop(columns=['ORGANISATION_LONG_NAME_previous'])
 
 # %%
 # CARRY OUT CHECKS ON MERGED DATA
@@ -218,8 +219,7 @@ df_manual = df_manual.rename(
 # %%
 # Merge in manual classifications
 # NB: combine_first() is used here rather than merge() as these columns already
-# exist in the data
-# NB: combine_first() is used here rather than fillna() as this doesn't rely on
+# exist in the data, and rather than fillna() as this doesn't rely on
 # us having a unique index
 # NB: We can't use inplace=True, as combine_first() would return None, which we
 # wouldn't be able to reset the index on
