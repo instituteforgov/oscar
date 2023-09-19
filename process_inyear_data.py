@@ -264,4 +264,5 @@ assert len(df_inyear_annual_merged) == len(df_inyear_annual), \
 # %%
 # EDIT DATA
 # Add a column to indicate when the data was added
-df_inyear_annual_merged['Added'] = pd.to_datetime('today')
+df_inyear_annual_merged['Added'] = pd.to_datetime('today').date()
+
