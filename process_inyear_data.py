@@ -163,6 +163,8 @@ df_previous = pd.read_pickle('2022_11_22_matched_oscar_21_22.pkl')
 
 # %%
 # MERGE IN ORG DETAILS FROM PREVIOUS OSCAR DATA
+# NB: merge() is used here rather than combine_first() as these columns don't
+# already exist in the data
 df_inyear_annual_merged = df_inyear_annual.merge(
     df_previous[
         [
@@ -176,6 +178,70 @@ df_inyear_annual_merged = df_inyear_annual.merge(
     how='left',
     on=['ORGANISATION_LONG_NAME', 'ORGANISATION_CODE']
 )
+
+# %%
+# CARRY OUT CHECKS ON MERGED DATA
+# Check that df_inyear_annual_merged has the same number of rows as df_inyear_annual
+assert len(df_inyear_annual_merged) == len(df_inyear_annual), \
+    'df_inyear_annual_merged has a different number of rows to df_inyear_annual'
+
+# %%
+# MERGE IN ORG DETAILS FROM MANUAL CLASSIFICATION
+# Read in manual classifications
+os.chdir(
+    'C:/Users/' + os.getlogin() + '/'
+    'Institute for Government/' +
+    'Data - General/' +
+    'Public finances/OSCAR/'
+)
+
+df_manual = pd.read_excel(
+    'IfG classification of bodies.xlsx',
+    sheet_name='2023',
+    usecols=[
+        'New organisation name',
+        'Name to use',
+        'Organisation type',
+        'Organisation status',
+    ]
+)
+
+df_manual = df_manual.rename(
+    columns={
+        'New organisation name': 'ORGANISATION_LONG_NAME',
+        'Name to use': 'Checked_Organisation_Name',
+        'Organisation type': 'IfG_Organisation_Type',
+        'Organisation status': 'IfG_Organisation_Status',
+    }
+)
+
+# %%
+# Merge in manual classifications
+# NB: combine_first() is used here rather than merge() as these columns already
+# exist in the data
+# NB: combine_first() is used here rather than fillna() as this doesn't rely on
+# us having a unique index
+# NB: We can't use inplace=True, as combine_first() would return None, which we
+# wouldn't be able to reset the index on
+df_inyear_annual_merged = df_inyear_annual_merged.set_index('ORGANISATION_LONG_NAME').combine_first(
+    df_manual[
+        [
+            'ORGANISATION_LONG_NAME',
+            'IfG_Organisation_Type',
+            'IfG_Organisation_Status',
+            'Checked_Organisation_Name'
+        ]
+    ].drop_duplicates().set_index('ORGANISATION_LONG_NAME'),
+).reset_index()
+
+# %%
+# Drop rows where AMOUNT is NaN
+# NB: We need to do this as combine_first() will have created rows where
+# an organisation exists in df_manual, even where it doesn't exist in
+# df_inyear_annual_merged
+df_inyear_annual_merged = df_inyear_annual_merged[
+    df_inyear_annual_merged['AMOUNT'].notna()
+]
 
 # %%
 # CARRY OUT CHECKS ON MERGED DATA
