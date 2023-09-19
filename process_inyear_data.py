@@ -235,6 +235,18 @@ df_inyear_annual_merged = df_inyear_annual_merged.set_index('ORGANISATION_LONG_N
 ).reset_index()
 
 # %%
+# Reset order of columns, which is lost by combine_first()
+df_inyear_annual_merged = df_inyear_annual_merged[
+    [c for c in df_inyear_annual.columns if c not in ['Version', 'AMOUNT']] + [
+        'IfG_Organisation_Type',
+        'IfG_Organisation_Status',
+        'Checked_Organisation_Name',
+        'Version',
+        'AMOUNT'
+    ]
+]
+
+# %%
 # Drop rows where AMOUNT is NaN
 # NB: We need to do this as combine_first() will have created rows where
 # an organisation exists in df_manual, even where it doesn't exist in
