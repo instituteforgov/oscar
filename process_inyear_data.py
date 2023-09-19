@@ -133,24 +133,21 @@ df_inyear = df_inyear[
 # SUM SPENDING
 df_inyear_annual = df_inyear.groupby(
     [
-        'ORGANISATION_LONG_NAME',
-        'ORGANISATION_CODE',
-        'CONTROL_BUDGET_L0_LONG_NAME',
-        'CONTROL_BUDGET_L1_LONG_NAME',
-        'DEPARTMENT_GROUP_LONG_NAME',
-        'Sub Segment Code',
-        'Sub Segment Long Name',
-        'ECONOMIC_CATEGORY_LONG_NAME',
-        'ECONOMIC_CATEGORY_CODE',
         'PESA_ECONOMIC_GROUP_CODE',
         'PESA_ECONOMIC_BUDGET_CODE',
+        'CONTROL_BUDGET_L0_LONG_NAME',
+        'CONTROL_BUDGET_L1_LONG_NAME',
+        'ECONOMIC_CATEGORY_LONG_NAME',
+        'ECONOMIC_CATEGORY_CODE',
+        'DEPARTMENT_GROUP_LONG_NAME',
+        'ORGANISATION_CODE',
+        'ORGANISATION_LONG_NAME',
+        'Financial_Year',
+        'Sub Segment Code',
+        'Sub Segment Long Name',
         'Version',
-        'Financial_Year'
     ]
 ).agg({'AMOUNT': 'sum'}).reset_index()
-
-# %%
-df_inyear_annual
 
 # %%
 # READ IN PREVIOUS OSCAR DATA, FROM WHICH WE'LL PULL IN ORG DETAILS
