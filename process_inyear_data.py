@@ -113,6 +113,28 @@ df_inyear = df_inyear[
 ]
 
 # %%
+# Reorder columns
+df_inyear = df_inyear[
+    [
+        'PESA_ECONOMIC_BUDGET_CODE',
+        'PESA_ECONOMIC_GROUP_CODE',
+        'CONTROL_BUDGET_L0_LONG_NAME',
+        'CONTROL_BUDGET_L1_LONG_NAME',
+        'ECONOMIC_CATEGORY_LONG_NAME',
+        'ECONOMIC_CATEGORY_CODE',
+        'AMOUNT',
+        'DEPARTMENT_GROUP_LONG_NAME',
+        'ORGANISATION_CODE',
+        'ORGANISATION_LONG_NAME',
+        'Financial_Year',
+        'Version',
+        'Sub Segment Code',
+        'Sub Segment Long Name',
+        'Added',
+    ]
+]
+
+# %%
 # SUM SPENDING
 df_inyear_annual = df_inyear.groupby(
     [
