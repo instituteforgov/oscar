@@ -98,10 +98,6 @@ df_inyear = df_inyear.rename(columns=column_renamings)
 df_inyear = df_inyear.drop(columns=columns_to_drop)
 
 # %%
-# Add a column to indicate when the data was added
-df_inyear['Added'] = pd.to_datetime('today')
-
-# %%
 # Exclude non-budget, non-voted spend
 # NB: Note that these differ from what we get in the full year data - the values
 # we get in the CONTROL_BUDGET_L0_LONG_NAME column differ and we don't
@@ -129,8 +125,7 @@ df_inyear = df_inyear[
         'Financial_Year',
         'Version',
         'Sub Segment Code',
-        'Sub Segment Long Name',
-        'Added',
+        'Sub Segment Long Name'
     ]
 ]
 
@@ -150,8 +145,7 @@ df_inyear_annual = df_inyear.groupby(
         'PESA_ECONOMIC_GROUP_CODE',
         'PESA_ECONOMIC_BUDGET_CODE',
         'Version',
-        'Financial_Year',
-        'Added'
+        'Financial_Year'
     ]
 ).agg({'AMOUNT': 'sum'}).reset_index()
 
@@ -171,4 +165,28 @@ os.chdir(
 df_previous = pd.read_pickle('2022_11_22_matched_oscar_21_22.pkl')
 
 # %%
-df_previous
+# MERGE IN ORG DETAILS FROM PREVIOUS OSCAR DATA
+df_inyear_annual_merged = df_inyear_annual.merge(
+    df_previous[
+        [
+            'ORGANISATION_LONG_NAME',
+            'ORGANISATION_CODE',
+            'IfG_Organisation_Type',
+            'IfG_Organisation_Status',
+            'Checked_Organisation_Name'
+        ]
+    ].drop_duplicates(),
+    how='left',
+    on=['ORGANISATION_LONG_NAME', 'ORGANISATION_CODE']
+)
+
+# %%
+# CARRY OUT CHECKS ON MERGED DATA
+# Check that df_inyear_annual_merged has the same number of rows as df_inyear_annual
+assert len(df_inyear_annual_merged) == len(df_inyear_annual), \
+    'df_inyear_annual_merged has a different number of rows to df_inyear_annual'
+
+# %%
+# EDIT DATA
+# Add a column to indicate when the data was added
+df_inyear_annual_merged['Added'] = pd.to_datetime('today')
