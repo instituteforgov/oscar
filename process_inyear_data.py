@@ -267,12 +267,26 @@ df_inyear_annual_merged['Added'] = pd.to_datetime('today').date()
 # %%
 # CARRY OUT FINAL CHECKS ON DATA
 # Check that no bodies have IfG_Organisation_Status, Checked_Organisation_Name or
-# IfG_Organisation_Type of NaN
-assert df_inyear_annual_merged['IfG_Organisation_Status'].isna().sum() == 0, \
-    'NaN values in IfG_Organisation_Status column'
+# IfG_Organisation_Type featuring 'CHECK'
+assert df_inyear_annual_merged[
+    df_inyear_annual_merged['Checked_Organisation_Name'].str.contains('CHECK')
+].empty, 'Found records with Checked_Organisation_Name featuring the string "CHECK"'
 
+assert df_inyear_annual_merged[
+    df_inyear_annual_merged['IfG_Organisation_Type'].str.contains('CHECK')
+].empty, 'Found records with IfG_Organisation_Type featuring the string "CHECK"'
+
+assert df_inyear_annual_merged[
+    df_inyear_annual_merged['IfG_Organisation_Status'].str.contains('CHECK')
+].empty, 'Found records with IfG_Organisation_Status featuring the string "CHECK"'
+
+# Check that no bodies have IfG_Organisation_Status, Checked_Organisation_Name or
+# IfG_Organisation_Type of NaN
 assert df_inyear_annual_merged['Checked_Organisation_Name'].isna().sum() == 0, \
     'NaN values in Checked_Organisation_Name column'
+
+assert df_inyear_annual_merged['IfG_Organisation_Status'].isna().sum() == 0, \
+    'NaN values in IfG_Organisation_Status column'
 
 assert df_inyear_annual_merged['IfG_Organisation_Type'].isna().sum() == 0, \
     'NaN values in IfG_Organisation_Type column'
