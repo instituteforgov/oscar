@@ -7,6 +7,7 @@
         Read in an in-year release of OSCAR data and compare it to the master list of organisations
     Inputs
         - csv: 'OSCAR_in_year_dataset_June_2023.csv'
+        - pkl: 'oscar_2021_2022_annual.pkl'
     Outputs
         None
     Parameters
@@ -45,7 +46,7 @@ os.chdir(
     'Scripts/Data'
 )
 
-df_master = pd.read_pickle('2022_11_22_matched_oscar_21_22.pkl')
+df_master = pd.read_pickle('oscar_2021_2022_annual.pkl')
 
 # %%
 # Get unique organisation names in in-year OSCAR data not in master list
@@ -54,8 +55,3 @@ set(
 ) - set(
     df_master['ORGANISATION_LONG_NAME'].unique()
 )
-
-# %%
-df_master['ORGANISATION_LONG_NAME'].unique()
-
-# %%
