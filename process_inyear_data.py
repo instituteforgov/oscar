@@ -10,11 +10,13 @@
         - csv: 'OSCAR_in_year_dataset_June_2023.csv'
         - pkl: 'oscar_2021_2022_annual.pkl'
     Outputs
-        None
+        - pkl: 'oscar_2022_2023_inyear_june_2023.pkl'
+        - xlsx: 'oscar_2022_2023_inyear_june_2023.xlsx'
     Parameters
         - column_renamings: Dictionary of column names used in the in-year data,
             and the renaming we want to apply
         - columns_to_drop: List of columns we want to drop from the in-year data
+        - collated_data_columns: List of columns in the collated OSCAR data
     Notes
         - We exclude non-budget, non-voted spend, as per previous Whitehall
         Monitor analysis
@@ -23,6 +25,7 @@
 import os
 
 import pandas as pd
+from pandas.io.formats import excel
 
 # %%
 # DEFINE PARAMETERS
@@ -43,6 +46,32 @@ column_renamings = {
 columns_to_drop = [
     'Quarter',
     'Month'
+]
+
+collated_data_columns = [
+    'PESA_ECONOMIC_BUDGET_CODE',
+    'PESA_ECONOMIC_GROUP_CODE',
+    'CONTROL_BUDGET_L0_LONG_NAME',
+    'CONTROL_BUDGET_L1_LONG_NAME',
+    'ECONOMIC_CATEGORY_LONG_NAME',
+    'ECONOMIC_CATEGORY_CODE',
+    'ACCOUNTING_AUTHORITY_L0_CODE',
+    'ECONOMIC_GROUP_LONG_NAME',
+    'INCOME_CATEGORY_SHORT_NAME',
+    'CHART_OF_ACCOUNTS_L5_LONG_NAME',
+    'BUDGETING_ORGANISATIONS_CODE',
+    'DEPARTMENT_GROUP_CODE',
+    'DEPARTMENT_GROUP_LONG_NAME',
+    'ORGANISATION_CODE',
+    'ORGANISATION_LONG_NAME',
+    'ORGANISATION_TYPE_L1_LONG_NAME',
+    'ORGANISATION_TYPE_L1_CODE',
+    'Financial_Year',
+    'Checked_Organisation_Name',
+    'IfG_Organisation_Type',
+    'IfG_Organisation_Status',
+    'AMOUNT',
+    'Added',
 ]
 
 # %%
@@ -290,3 +319,38 @@ assert df_inyear_annual_merged['IfG_Organisation_Status'].isna().sum() == 0, \
 
 assert df_inyear_annual_merged['IfG_Organisation_Type'].isna().sum() == 0, \
     'NaN values in IfG_Organisation_Type column'
+
+# %%
+# SAVE DATA TO PICKLE
+os.chdir(
+    'C:/Users/' + os.getlogin() + '/'
+    'Institute for Government/' +
+    'Data - General/' +
+    'Public finances/OSCAR/' +
+    'Scripts/data'
+)
+
+df_inyear_annual_merged.to_pickle('oscar_2022_2023_inyear_june_2023.pkl')
+
+# %%
+# ADD EMPTY COLUMNS TO MATCH THOSE IN COLLATED DATA AND REORDER
+df_inyear_annual_merged = df_inyear_annual_merged.reindex(columns=collated_data_columns)
+df_inyear_annual_test = df_inyear_annual_merged[collated_data_columns]
+
+# %%
+df_inyear_annual_test
+
+# %%
+# SAVE DATA TO EXCEL
+os.chdir(
+    'C:/Users/' + os.getlogin() + '/'
+    'Institute for Government/' +
+    'Data - General/' +
+    'Public finances/OSCAR/' +
+    'Scripts/temp'
+)
+
+excel.ExcelFormatter.header_style = None
+df_inyear_annual_merged.to_excel('oscar_2022_2023_inyear_june_2023.xlsx', index=False)
+
+# %%
