@@ -8,6 +8,7 @@
         to our aggregated OSCAR data
     Inputs
         - csv: 'OSCAR_in_year_dataset_June_2023.csv'
+        - pkl: 'oscar_2021_2022_annual.pkl'
     Outputs
         None
     Parameters
@@ -157,25 +158,23 @@ os.chdir(
     'Institute for Government/' +
     'Data - General/' +
     'Public finances/OSCAR/' +
-    'Scripts/Data'
+    'Scripts/data'
 )
 
-df_previous = pd.read_pickle('2022_11_22_matched_oscar_21_22.pkl')
+df_previous = pd.read_pickle('oscar_2021_2022_annual.pkl')
 
 # %%
 # MERGE IN ORG DETAILS FROM PREVIOUS OSCAR DATA
 # NB: merge() is used here rather than combine_first() as these columns don't
 # already exist in the data
 df_inyear_annual_merged = df_inyear_annual.merge(
-    df_previous[
-        [
+    df_previous[[
             'ORGANISATION_LONG_NAME',
             'ORGANISATION_CODE',
             'IfG_Organisation_Type',
             'IfG_Organisation_Status',
             'Checked_Organisation_Name'
-        ]
-    ].drop_duplicates(),
+    ]].drop_duplicates(),
     how='left',
     on=['ORGANISATION_CODE'],
     suffixes=(None, '_previous'),
@@ -225,14 +224,12 @@ df_manual = df_manual.rename(
 # NB: We can't use inplace=True, as combine_first() would return None, which we
 # wouldn't be able to reset the index on
 df_inyear_annual_merged = df_inyear_annual_merged.set_index('ORGANISATION_LONG_NAME').combine_first(
-    df_manual[
-        [
+    df_manual[[
             'ORGANISATION_LONG_NAME',
             'IfG_Organisation_Type',
             'IfG_Organisation_Status',
             'Checked_Organisation_Name'
-        ]
-    ].drop_duplicates().set_index('ORGANISATION_LONG_NAME'),
+    ]].drop_duplicates().set_index('ORGANISATION_LONG_NAME'),
 ).reset_index()
 
 # %%
