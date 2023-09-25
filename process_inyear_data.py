@@ -74,6 +74,18 @@ collated_data_columns = [
     'Added',
 ]
 
+control_budget_l0_replacements = {
+    'TOTAL DEL': 'DEPARTMENTAL EXPENDITURE LIMITS',
+    'TOTAL AME': 'ANNUALLY MANAGED EXPENDITURE'
+}
+
+control_budget_l1_replacements = {
+    'DEL PROG': 'DEPARTMENTAL EXPENDITURE LIMITS PROGRAMME',
+    'DEL ADMIN': 'DEPARTMENTAL EXPENDITURE LIMITS ADMINISTRATION',
+    'DEPT AME': 'DEPARTMENTAL ANNUALLY MANAGED EXPENDITURE',
+    'NON-DEPT AME': 'NON-DEPARTMENTAL ANNUALLY MANAGED EXPENDITURE',
+}
+
 # %%
 # READ IN IN-YEAR OSCAR DATA
 os.chdir(
@@ -294,6 +306,19 @@ assert len(df_inyear_annual_merged) == len(df_inyear_annual), \
 df_inyear_annual_merged['Added'] = pd.to_datetime('today').date()
 
 # %%
+# Bring CONTROL_BUDGET_L0_LONG_NAME, CONTROL_BUDGET_L1_LONG_NAME values in line with
+# those in collated data
+df_inyear_annual_merged['CONTROL_BUDGET_L0_LONG_NAME'].replace(
+    control_budget_l0_replacements,
+    inplace=True
+)
+
+df_inyear_annual_merged['CONTROL_BUDGET_L1_LONG_NAME'].replace(
+    control_budget_l1_replacements,
+    inplace=True
+)
+
+# %%
 # CARRY OUT FINAL CHECKS ON DATA
 # Check that no bodies have IfG_Organisation_Status, Checked_Organisation_Name or
 # IfG_Organisation_Type featuring 'CHECK'
@@ -335,10 +360,7 @@ df_inyear_annual_merged.to_pickle('oscar_2022_2023_inyear_june_2023.pkl')
 # %%
 # ADD EMPTY COLUMNS TO MATCH THOSE IN COLLATED DATA AND REORDER
 df_inyear_annual_merged = df_inyear_annual_merged.reindex(columns=collated_data_columns)
-df_inyear_annual_test = df_inyear_annual_merged[collated_data_columns]
-
-# %%
-df_inyear_annual_test
+df_inyear_annual_merged = df_inyear_annual_merged[collated_data_columns]
 
 # %%
 # SAVE DATA TO EXCEL
