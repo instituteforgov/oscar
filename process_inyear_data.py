@@ -88,15 +88,16 @@ control_budget_l1_replacements = {
 
 # %%
 # READ IN IN-YEAR OSCAR DATA
-os.chdir(
+file_path_inyear = (
     'C:/Users/' + os.getlogin() + '/'
     'Institute for Government/' +
     'Data - General/' +
     'Public finances/OSCAR/' +
     'Source/In-year data'
 )
+file_name_inyear = 'OSCAR_in_year_dataset_June_2023.csv'
 
-df_inyear = pd.read_csv('OSCAR_in_year_dataset_June_2023.csv', encoding='cp1252')
+df_inyear = pd.read_csv(file_path_inyear + '/' + file_name_inyear, encoding='cp1252')
 
 # %%
 # RUN CHECKS ON DATA
@@ -174,7 +175,7 @@ df_inyear = df_inyear[
 
 # %%
 # SUM SPENDING
-df_inyear_annual = df_inyear.groupby(
+df_inyear_total = df_inyear.groupby(
     [
         'PESA_ECONOMIC_GROUP_CODE',
         'PESA_ECONOMIC_BUDGET_CODE',
@@ -194,21 +195,22 @@ df_inyear_annual = df_inyear.groupby(
 
 # %%
 # READ IN PREVIOUS OSCAR DATA, FROM WHICH WE'LL PULL IN ORG DETAILS
-os.chdir(
+file_path_previous = (
     'C:/Users/' + os.getlogin() + '/'
     'Institute for Government/' +
     'Data - General/' +
     'Public finances/OSCAR/' +
     'Scripts/data'
 )
+file_name_previous = 'oscar_2021_2022_annual.pkl'
 
-df_previous = pd.read_pickle('oscar_2021_2022_annual.pkl')
+df_previous = pd.read_pickle(file_path_previous + '/' + file_name_previous)
 
 # %%
 # MERGE IN ORG DETAILS FROM PREVIOUS OSCAR DATA
 # NB: merge() is used here rather than combine_first() as these columns don't
 # already exist in the data
-df_inyear_annual_merged = df_inyear_annual.merge(
+df_inyear_total_merged = df_inyear_total.merge(
     df_previous[[
             'ORGANISATION_LONG_NAME',
             'ORGANISATION_CODE',
@@ -223,22 +225,23 @@ df_inyear_annual_merged = df_inyear_annual.merge(
 
 # %%
 # CARRY OUT CHECKS ON MERGED DATA
-# Check that df_inyear_annual_merged has the same number of rows as df_inyear_annual
-assert len(df_inyear_annual_merged) == len(df_inyear_annual), \
-    'df_inyear_annual_merged has a different number of rows to df_inyear_annual'
+# Check that df_inyear_total_merged has the same number of rows as df_inyear_total
+assert len(df_inyear_total_merged) == len(df_inyear_total), \
+    'df_inyear_total_merged has a different number of rows to df_inyear_total'
 
 # %%
 # MERGE IN ORG DETAILS FROM MANUAL CLASSIFICATION
 # Read in manual classifications
-os.chdir(
+file_path_manual = (
     'C:/Users/' + os.getlogin() + '/'
     'Institute for Government/' +
     'Data - General/' +
     'Public finances/OSCAR/'
 )
+file_name_manual = 'IfG classification of bodies.xlsx'
 
 df_manual = pd.read_excel(
-    'IfG classification of bodies.xlsx',
+    file_path_manual + '/' + file_name_manual,
     sheet_name='2023',
     usecols=[
         'New organisation name',
@@ -264,7 +267,7 @@ df_manual = df_manual.rename(
 # us having a unique index
 # NB: We can't use inplace=True, as combine_first() would return None, which we
 # wouldn't be able to reset the index on
-df_inyear_annual_merged = df_inyear_annual_merged.set_index('ORGANISATION_LONG_NAME').combine_first(
+df_inyear_total_merged = df_inyear_total_merged.set_index('ORGANISATION_LONG_NAME').combine_first(
     df_manual[[
             'ORGANISATION_LONG_NAME',
             'IfG_Organisation_Type',
@@ -275,8 +278,8 @@ df_inyear_annual_merged = df_inyear_annual_merged.set_index('ORGANISATION_LONG_N
 
 # %%
 # Reset order of columns, which is lost by combine_first()
-df_inyear_annual_merged = df_inyear_annual_merged[
-    [c for c in df_inyear_annual.columns if c not in ['Version', 'AMOUNT']] + [
+df_inyear_total_merged = df_inyear_total_merged[
+    [c for c in df_inyear_total.columns if c not in ['Version', 'AMOUNT']] + [
         'IfG_Organisation_Type',
         'IfG_Organisation_Status',
         'Checked_Organisation_Name',
@@ -289,31 +292,31 @@ df_inyear_annual_merged = df_inyear_annual_merged[
 # Drop rows where AMOUNT is NaN
 # NB: We need to do this as combine_first() will have created rows where
 # an organisation exists in df_manual, even where it doesn't exist in
-# df_inyear_annual_merged
-df_inyear_annual_merged = df_inyear_annual_merged[
-    df_inyear_annual_merged['AMOUNT'].notna()
+# df_inyear_total_merged
+df_inyear_total_merged = df_inyear_total_merged[
+    df_inyear_total_merged['AMOUNT'].notna()
 ]
 
 # %%
 # CARRY OUT CHECKS ON MERGED DATA
-# Check that df_inyear_annual_merged has the same number of rows as df_inyear_annual
-assert len(df_inyear_annual_merged) == len(df_inyear_annual), \
-    'df_inyear_annual_merged has a different number of rows to df_inyear_annual'
+# Check that df_inyear_total_merged has the same number of rows as df_inyear_total
+assert len(df_inyear_total_merged) == len(df_inyear_total), \
+    'df_inyear_total_merged has a different number of rows to df_inyear_total'
 
 # %%
 # EDIT DATA
 # Add a column to indicate when the data was added
-df_inyear_annual_merged['Added'] = pd.to_datetime('today').date()
+df_inyear_total_merged['Added'] = pd.to_datetime('today').date()
 
 # %%
 # Bring CONTROL_BUDGET_L0_LONG_NAME, CONTROL_BUDGET_L1_LONG_NAME values in line with
 # those in collated data
-df_inyear_annual_merged['CONTROL_BUDGET_L0_LONG_NAME'].replace(
+df_inyear_total_merged['CONTROL_BUDGET_L0_LONG_NAME'].replace(
     control_budget_l0_replacements,
     inplace=True
 )
 
-df_inyear_annual_merged['CONTROL_BUDGET_L1_LONG_NAME'].replace(
+df_inyear_total_merged['CONTROL_BUDGET_L1_LONG_NAME'].replace(
     control_budget_l1_replacements,
     inplace=True
 )
@@ -322,57 +325,59 @@ df_inyear_annual_merged['CONTROL_BUDGET_L1_LONG_NAME'].replace(
 # CARRY OUT FINAL CHECKS ON DATA
 # Check that no bodies have IfG_Organisation_Status, Checked_Organisation_Name or
 # IfG_Organisation_Type featuring 'CHECK'
-assert df_inyear_annual_merged[
-    df_inyear_annual_merged['Checked_Organisation_Name'].str.contains('CHECK')
+assert df_inyear_total_merged[
+    df_inyear_total_merged['Checked_Organisation_Name'].str.contains('CHECK')
 ].empty, 'Found records with Checked_Organisation_Name featuring the string "CHECK"'
 
-assert df_inyear_annual_merged[
-    df_inyear_annual_merged['IfG_Organisation_Type'].str.contains('CHECK')
+assert df_inyear_total_merged[
+    df_inyear_total_merged['IfG_Organisation_Type'].str.contains('CHECK')
 ].empty, 'Found records with IfG_Organisation_Type featuring the string "CHECK"'
 
-assert df_inyear_annual_merged[
-    df_inyear_annual_merged['IfG_Organisation_Status'].str.contains('CHECK')
+assert df_inyear_total_merged[
+    df_inyear_total_merged['IfG_Organisation_Status'].str.contains('CHECK')
 ].empty, 'Found records with IfG_Organisation_Status featuring the string "CHECK"'
 
 # Check that no bodies have IfG_Organisation_Status, Checked_Organisation_Name or
 # IfG_Organisation_Type of NaN
-assert df_inyear_annual_merged['Checked_Organisation_Name'].isna().sum() == 0, \
+assert df_inyear_total_merged['Checked_Organisation_Name'].isna().sum() == 0, \
     'NaN values in Checked_Organisation_Name column'
 
-assert df_inyear_annual_merged['IfG_Organisation_Status'].isna().sum() == 0, \
+assert df_inyear_total_merged['IfG_Organisation_Status'].isna().sum() == 0, \
     'NaN values in IfG_Organisation_Status column'
 
-assert df_inyear_annual_merged['IfG_Organisation_Type'].isna().sum() == 0, \
+assert df_inyear_total_merged['IfG_Organisation_Type'].isna().sum() == 0, \
     'NaN values in IfG_Organisation_Type column'
 
 # %%
 # SAVE DATA TO PICKLE
-os.chdir(
+file_path_pickle_output = (
     'C:/Users/' + os.getlogin() + '/'
     'Institute for Government/' +
     'Data - General/' +
     'Public finances/OSCAR/' +
     'Scripts/data'
 )
+file_name_pickle_output = 'oscar_2022_2023_inyear_june_2023.pkl'
 
-df_inyear_annual_merged.to_pickle('oscar_2022_2023_inyear_june_2023.pkl')
+df_inyear_total_merged.to_pickle(file_path_pickle_output + '/' + file_name_pickle_output)
 
 # %%
 # ADD EMPTY COLUMNS TO MATCH THOSE IN COLLATED DATA AND REORDER
-df_inyear_annual_merged = df_inyear_annual_merged.reindex(columns=collated_data_columns)
-df_inyear_annual_merged = df_inyear_annual_merged[collated_data_columns]
+df_inyear_total_merged = df_inyear_total_merged.reindex(columns=collated_data_columns)
+df_inyear_total_merged = df_inyear_total_merged[collated_data_columns]
 
 # %%
 # SAVE DATA TO EXCEL
-os.chdir(
+file_path_excel_output = (
     'C:/Users/' + os.getlogin() + '/'
     'Institute for Government/' +
     'Data - General/' +
     'Public finances/OSCAR/' +
     'Scripts/temp'
 )
+file_name_excel_output = 'oscar_2022_2023_inyear_june_2023.xlsx'
 
 excel.ExcelFormatter.header_style = None
-df_inyear_annual_merged.to_excel('oscar_2022_2023_inyear_june_2023.xlsx', index=False)
+df_inyear_total_merged.to_excel(file_path_excel_output + file_name_excel_output, index=False)
 
 # %%
