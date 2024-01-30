@@ -129,7 +129,7 @@ assert len(df_inyear['Version'].unique()) == 1, 'More than one Version in in-yea
 
 # %%
 # Check that for any one organisation, only one organisation code is used
-assert df_inyear.groupby('Organisation')['Organisation Code'].nunique().max(), \
+assert df_inyear.groupby('Organisation')['Organisation Code'].nunique().max() == 1, \
     'More than one organisation code for an organisation'
 
 # %%
