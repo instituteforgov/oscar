@@ -14,7 +14,7 @@
         None
     Notes
         None
-    Future developments:
+    Future developments
         - Convert this into a function that can be called from either process_inyear_data.py
         or process_annual_data.py
 '''
@@ -27,7 +27,7 @@ import pandas as pd
 # %%
 # READ IN DATASETS
 # Read in annual OSCAR data
-new_data_path = (
+new_source_data_path = (
     'C:/Users/' + os.getlogin() + '/'
     'Institute for Government/' +
     'Data - General/' +
@@ -35,7 +35,7 @@ new_data_path = (
     'Source/Annual data/202223/'
 )
 
-df_new = pd.read_csv(new_data_path + 'MFO-R13-2022-23.csv', encoding='cp1252')
+df_new = pd.read_csv(new_source_data_path + 'MFO-R13-2022-23.csv', encoding='cp1252')
 
 # %%
 # Read in organisations lookup

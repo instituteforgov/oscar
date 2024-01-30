@@ -8,20 +8,23 @@
         - To see whether column names are consistent
         - To see whether presence of nulls is consistent
     Inputs
-        - txt: '2022_OSCAR_Extract_2017_18.txt'
-        - txt: '2022_OSCAR_Extract_2018_19.txt'
-        - txt: '2022_OSCAR_Extract_2019_20.txt'
-        - txt: '2022_OSCAR_Extract_2020_21.txt'
-        - csv: 'MFO-R13-2021-22.csv'
-        - csv: 'MFO-R13-2022-23.csv'
+        - txt: '../Source/Annual data/201718/2022_OSCAR_Extract_2017_18.txt'
+        - txt: '../Source/Annual data/201819/2022_OSCAR_Extract_2018_19.txt'
+        - txt: '../Source/Annual data/201920/2022_OSCAR_Extract_2019_20.txt'
+        - txt: '../Source/Annual data/202021/2022_OSCAR_Extract_2020_21.txt'
+        - csv: '../Source/Annual data/202122/MFO-R13-2021-22.csv'
+        - csv: '../Source/Annual data/202223/MFO-R13-2022-23.csv'
     Outputs
-        - pkl: 'df_all_201718_202223.pkl'
+        - pkl: 'temp/df_all_201718_202223.pkl'
             - NB: This creates a very large file
-        - xlsx: 'Nulls in annual data.xlsx'
+        - xlsx: '../Docs/Nulls in annual data.xlsx'
     Parameters
         - files: Dictionary of file names
     Notes
         None
+    Future developments
+        - Move data checks to functions
+        - Move data cleaning to functions
 '''
 
 import os
@@ -32,7 +35,7 @@ from pandas.io.formats import excel
 from ds_utils import dataframe_operations as do
 
 # %%
-# READ IN ANNUAL OSCAR DATA
+# DEFINE PARAMETERS
 files = {
     '201718': '2022_OSCAR_Extract_2017_18.txt',
     '201819': '2022_OSCAR_Extract_2018_19.txt',
@@ -42,7 +45,9 @@ files = {
     '202223': 'MFO-R13-2022-23.csv',
 }
 
-source_data_annual_file_path_stub = (
+# %%
+# READ IN NEW DATA
+new_source_data_path_stub = (
     'C:/Users/' + os.getlogin() + '/'
     'Institute for Government/' +
     'Data - General/' +
@@ -52,7 +57,7 @@ source_data_annual_file_path_stub = (
 
 dict_annual = {
     year: pd.read_csv(
-        source_data_annual_file_path_stub + year + '/' + file_name,
+        new_source_data_path_stub + year + '/' + file_name,
         encoding='cp1252',
         sep='|' if '.txt' in file_name else ','
     )
@@ -80,7 +85,7 @@ df_all['YEAR_SHORT_NAME'] = (
 
 # %%
 # SAVE TEMPORARY COPY OF DATA
-temp_file_path = (
+temp_path = (
     'C:/Users/' + os.getlogin() + '/'
     'Institute for Government/' +
     'Data - General/' +
@@ -88,7 +93,7 @@ temp_file_path = (
     'Scripts/temp/'
 )
 
-df_all.to_pickle(temp_file_path + 'df_all_201718_202223.pkl')
+df_all.to_pickle(temp_path + 'df_all_201718_202223.pkl')
 
 # %%
 # COUNT NUMBER OF COLUMN NULLS
@@ -112,7 +117,7 @@ df_all_column_nulls = df_all_column_nulls[[
 ]]
 
 # %% SAVE DETAILS OF NULLS TO EXCEL
-docs_file_path = (
+docs_path = (
     'C:/Users/' + os.getlogin() + '/'
     'Institute for Government/' +
     'Data - General/' +
@@ -123,7 +128,7 @@ docs_file_path = (
 excel.ExcelFormatter.header_style = None
 
 df_all_column_nulls.to_excel(
-    docs_file_path + 'Nulls in annual data.xlsx',
+    docs_path + 'Nulls in annual data.xlsx',
     freeze_panes=(1, 1),
     engine='xlsxwriter',
     engine_kwargs={
