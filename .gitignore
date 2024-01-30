@@ -1,8 +1,11 @@
 /.ipynb_checkpoints
-/Archive
-/Data
+/archive
+/data/archive
 /env_pn
 /Temp
 
+*.pkl
 temp.py
 todo.txt
+
+!df_organisations_lookup.pkl

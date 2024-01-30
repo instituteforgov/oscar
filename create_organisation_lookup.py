@@ -7,10 +7,10 @@
         Create a lookup table of organisation codes, organisation names and IfG classifications
         (edited organisation name, organisation type, organisation sub-type)
     Inputs
-        - pkl: 'oscar_2021_2022_annual.pkl'
-        - xlsx: 'Collated OSCAR data.xlsx'
+        - pkl: 'data/oscar_2021_2022_annual.pkl'
+        - xlsx: '../Collated OSCAR data.xlsx'
     Outputs
-        - pkl: 'df_organisations_lookup.pkl'
+        - pkl: 'data/df_organisations_lookup.pkl'
     Parameters
         XXX
     Notes
@@ -51,7 +51,7 @@ scripts_data_path = (
     'Institute for Government/' +
     'Data - General/' +
     'Public finances/OSCAR/' +
-    'Scripts/Data/'
+    'Scripts/data/'
 )
 
 df_202122_annual = pd.read_pickle(scripts_data_path + 'oscar_2021_2022_annual.pkl')
@@ -230,12 +230,12 @@ df_lookup = pd.concat([
 
 # %%
 # SAVE LOOKUP TO PICKLE
-scripts_temp_path = (
+scripts_data_path = (
     'C:/Users/' + os.getlogin() + '/'
     'Institute for Government/' +
     'Data - General/' +
     'Public finances/OSCAR/' +
-    'Scripts/temp/'
+    'Scripts/data/'
 )
 
-df_lookup.to_pickle(scripts_temp_path + 'df_organisations_lookup.pkl')
+df_lookup.to_pickle(scripts_data_path + 'df_organisations_lookup.pkl')
