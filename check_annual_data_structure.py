@@ -7,6 +7,7 @@
         Compare OSCAR annual data
         - To see whether column names are consistent
         - To see whether presence of nulls is consistent
+        - To see how VERSION_CODE varies by year
     Inputs
         - txt: '../Source/Annual data/201718/2022_OSCAR_Extract_2017_18.txt'
         - txt: '../Source/Annual data/201819/2022_OSCAR_Extract_2018_19.txt'
@@ -17,7 +18,7 @@
     Outputs
         - pkl: 'temp/df_all_201718_202223.pkl'
             - NB: This creates a very large file
-        - xlsx: '../Docs/Nulls in annual data.xlsx'
+        - xlsx: '../Docs/Data structure - annual.xlsx'
     Parameters
         - files: Dictionary of file names
     Notes
@@ -96,18 +97,16 @@ temp_path = (
 df_all.to_pickle(temp_path + 'df_all_201718_202223.pkl')
 
 # %%
-# COUNT NUMBER OF COLUMN NULLS
-df_all_column_nulls = do.count_column_nulls(
+# CHECK DATA STRUCTURE
+# Tally nulls by column and year
+df_null_x_year = do.count_column_nulls(
     df_all,
     groupby=['YEAR_SHORT_NAME'],
     transpose=True,
     percent=True,
     format='{:,.1g}'
 )
-
-# %%
-# REORDER COLUMNS
-df_all_column_nulls = df_all_column_nulls[[
+df_null_x_year = df_null_x_year[[
     '2017/18',
     '2018/19',
     '2019/20',
@@ -116,7 +115,15 @@ df_all_column_nulls = df_all_column_nulls[[
     '2022/23',
 ]]
 
-# %% SAVE DETAILS OF NULLS TO EXCEL
+# %%
+# Produce cross-tab of capital spend by year and month
+df_version_code_x_year = pd.crosstab(
+    df_all['VERSION_CODE'],
+    df_all['YEAR_SHORT_NAME'],
+)
+
+# %%
+# SAVE TO EXCEL
 docs_path = (
     'C:/Users/' + os.getlogin() + '/'
     'Institute for Government/' +
@@ -127,13 +134,23 @@ docs_path = (
 
 excel.ExcelFormatter.header_style = None
 
-df_all_column_nulls.to_excel(
-    docs_path + 'Nulls in annual data.xlsx',
-    freeze_panes=(1, 1),
+with pd.ExcelWriter(
+    docs_path + 'Data structure - annual.xlsx',
     engine='xlsxwriter',
     engine_kwargs={
         'options': {
             'strings_to_numbers': True,
         }
     }
-)
+) as writer:
+
+    df_null_x_year.to_excel(
+        writer,
+        sheet_name='Nulls x year',
+        freeze_panes=(1, 1),
+    )
+    df_version_code_x_year.to_excel(
+        writer,
+        sheet_name='Version code x year',
+        freeze_panes=(1, 1),
+    )
