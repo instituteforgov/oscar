@@ -10,7 +10,7 @@
     Outputs
         - csv: 'Collated OSCAR data - capital spend by month, 201718-202223.csv'
     Parameters
-        - month_regex: Dictionary of regex expressions to convert month names to month codes
+        None
     Notes
         None
 '''
@@ -19,6 +19,8 @@ import os
 
 from IPython.display import display
 import pandas as pd
+
+from utils.functions import convert_month_string_to_code
 
 # %%
 # READ IN DATA
@@ -36,26 +38,7 @@ df_all = pd.read_pickle(temp_path + 'df_all_201718_202223.pkl')
 # %%
 # CLEAN DATA
 # Clean months, converting e.g. Jan-18 to P10
-month_regex = {
-    r'Jan.*': 'P10',
-    r'Feb.*': 'P11',
-    r'Mar.*': 'P12',
-    r'Apr.*': 'P01',
-    r'May.*': 'P02',
-    r'Jun.*': 'P03',
-    r'Jul.*': 'P04',
-    r'Aug.*': 'P05',
-    r'Sep.*': 'P06',
-    r'Oct.*': 'P07',
-    r'Nov.*': 'P08',
-    r'Dec.*': 'P09',
-    r'Period 0.*': 'P00',
-}
-
-df_all['MONTH_SHORT_NAME'] = df_all['MONTH_SHORT_NAME'].replace(
-    month_regex,
-    regex=True
-)
+df_all = convert_month_string_to_code(df_all, 'MONTH_SHORT_NAME')
 
 # %%
 # RESTRICT DATA
