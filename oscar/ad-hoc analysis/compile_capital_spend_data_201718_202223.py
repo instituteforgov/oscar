@@ -12,7 +12,7 @@
     Parameters
         - month_regex: Dictionary of regex expressions to convert month names to month codes
     Notes
-        XXX
+        None
 '''
 
 import os
