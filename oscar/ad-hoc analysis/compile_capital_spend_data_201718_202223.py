@@ -8,7 +8,7 @@
     Inputs
         - pkl: 'temp/df_all_201718_202223.pkl'
     Outputs
-        - csv: 'Collated OSCAR data - capital spend by month, 201718-202223.csv'
+        - csv: '../Ad-hoc analysis/Capital spend by month/Capital spend by month, 201718-202223.csv'
     Parameters
         None
     Notes
@@ -69,7 +69,7 @@ adhoc_analysis_path = (
 )
 
 df_capital.to_csv(
-    adhoc_analysis_path + 'Collated OSCAR data - capital spend by month, 201718-202223.csv',
+    adhoc_analysis_path + 'Capital spend by month/Capital spend by month, 201718-202223.csv',
     chunksize=10000,
     index=False,
 )
