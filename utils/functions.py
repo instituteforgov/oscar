@@ -46,3 +46,31 @@ def convert_month_string_to_code(
     )
 
     return df
+
+
+def strip_trailing_dept_initialism(
+    df: pd.DataFrame,
+    col: str,
+):
+    '''
+        Purpose
+            Strip trailing department initialisms from a column
+
+        Parameters
+            - df: DataFrame featuring column containing department names
+            - col: Column containing department names
+
+        Returns
+            - df: DataFrame with trailing department initialisms removed
+
+        Notes
+            - Currently only removes trailing 'BEIS', 'DCMS'
+    '''
+
+    df.loc[:, col] = df[col].str.replace(
+        r'\sBEIS|\sDCMS$',
+        '',
+        regex=True,
+    )
+
+    return df

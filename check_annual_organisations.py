@@ -24,6 +24,8 @@ import os
 
 import pandas as pd
 
+from utils.functions import strip_trailing_dept_initialism
+
 # %%
 # READ IN DATASETS
 # Read in annual OSCAR data
@@ -52,10 +54,9 @@ df_lookup = pd.read_pickle(scripts_data_path + 'df_organisations_lookup.pkl')
 # %%
 # CLEAN DATA
 # Remove trailing 'BEIS', 'DCMS' strings from ORGANISATION_LONG_NAME
-df_new['ORGANISATION_LONG_NAME'] = df_new['ORGANISATION_LONG_NAME'].str.replace(
-    r'\sBEIS|\sDCMS$',
-    '',
-    regex=True
+df_new = strip_trailing_dept_initialism(
+    df=df_new,
+    col='ORGANISATION_LONG_NAME',
 )
 
 # %%

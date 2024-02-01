@@ -27,6 +27,8 @@ import os
 
 import pandas as pd
 
+from utils.functions import strip_trailing_dept_initialism
+
 # %%
 # READ IN DATASETS
 # Collated OSCAR data
@@ -71,17 +73,21 @@ df_202122_annual = df_202122_annual[
 
 # %%
 # Remove trailing 'BEIS', 'DCMS' strings from ORGANISATION_LONG_NAME, Checked_Organisation_Name
-df_collated_data['ORGANISATION_LONG_NAME'] = (
-    df_collated_data['ORGANISATION_LONG_NAME'].str.replace(r'\sBEIS|\sDCMS$', '', regex=True)
+df_collated_data = strip_trailing_dept_initialism(
+    df=df_collated_data,
+    col='ORGANISATION_LONG_NAME',
 )
-df_collated_data['Checked_Organisation_Name'] = (
-    df_collated_data['Checked_Organisation_Name'].str.replace(r'\sBEIS|\sDCMS$', '', regex=True)
+df_collated_data = strip_trailing_dept_initialism(
+    df=df_collated_data,
+    col='Checked_Organisation_Name',
 )
-df_202122_annual['ORGANISATION_LONG_NAME'] = (
-    df_202122_annual['ORGANISATION_LONG_NAME'].str.replace(r'\sBEIS|\sDCMS$', '', regex=True)
+df_202122_annual = strip_trailing_dept_initialism(
+    df=df_202122_annual,
+    col='ORGANISATION_LONG_NAME',
 )
-df_202122_annual['Checked_Organisation_Name'] = (
-    df_202122_annual['Checked_Organisation_Name'].str.replace(r'\sBEIS|\sDCMS$', '', regex=True)
+df_202122_annual = strip_trailing_dept_initialism(
+    df=df_202122_annual,
+    col='Checked_Organisation_Name',
 )
 
 # %%
@@ -169,10 +175,9 @@ df_new = pd.read_csv(source_annual_202223_path + file_name_new, encoding='cp1252
 # %%
 # CLEAN DATA
 # Remove trailing 'BEIS', 'DCMS' strings from ORGANISATION_LONG_NAME
-df_new['ORGANISATION_LONG_NAME'] = df_new['ORGANISATION_LONG_NAME'].str.replace(
-    r'\sBEIS|\sDCMS$',
-    '',
-    regex=True
+df_new = strip_trailing_dept_initialism(
+    df=df_new,
+    col='ORGANISATION_LONG_NAME',
 )
 
 # %%
