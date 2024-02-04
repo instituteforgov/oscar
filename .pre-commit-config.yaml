@@ -16,7 +16,14 @@ repos:
         args: [--max-line-length=100]
 -   repo: local
     hooks:
-    -   id: XXX
-        name: XXX check
+    -   id: python-check-blanket-file-noqa
+        name: python-check-blanket-file-noqa
+        entry: 'flake8: noqa'
+        language: pygrep
+        types: [python]
+    -   id: check-xxx
+        name: check-xxx
         entry: (?i)XXX
         language: pygrep
+        types: [text]
+        exclude: .pre-commit-config.yaml
